@@ -1,0 +1,15 @@
+{
+  "name": "pontigram",
+  "version": "1.0.0",
+  "description": "Message bridge between chat and e-mail",
+  "repository": {
+    "url": "git+ssh://git@github.com/pietervanzutven/pontigram.git"
+  },
+  "license": "MIT",
+  "main": "index.js",
+  "author": "Pieter van Zutven",
+  "dependencies": {
+    "@adiwajshing/baileys": "^3.5.2",
+    "nodemailer": "^6.6.3"
+  }
+}
