@@ -7,15 +7,15 @@ let config = JSON.parse(fs.readFileSync("config.json"));
 
 let transporter = nodemailer.createTransport(config.transport);
 
-async function sendMail() {
+async function sendMail(from, subject, text) {
     let info = await transporter.sendMail({
-        from: '"Pontigram" <' + config.mail + '>',
+        from: '"' + from + '" <' + config.mail + '>',
         to: config.mail,
-        subject: "Test",
-        text: "This is a test e-mail from Pontigram."
+        subject: subject,
+        text: text
     });
 
     console.log("Message sent: %s", info.messageId);
 }
 
-sendMail();
+sendMail("Pontigram", "Test", "This is a test e-mail from Pontigram.");
