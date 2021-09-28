@@ -16,7 +16,7 @@ async function sendMail(from, subject, text) {
         text: text
     });
 
-    console.log("Message sent: %s", info.messageId);
+    console.log("E-mail sent: %s", info.messageId);
 }
 
 async function connectToWhatsApp() {
@@ -39,6 +39,7 @@ async function connectToWhatsApp() {
             let subject = "Private";
             let from = "";
             let to = "Me";
+            let text = "";
             if (envelope.key.fromMe) {
                 from = "Me";
                 to = conn.contacts[envelope.key.remoteJid].name;
@@ -56,22 +57,27 @@ async function connectToWhatsApp() {
 
             const content = envelope.message;
             if (content.conversation) {
-                console.log("conversation: " + content.conversation);
+                text = content.conversation;
             }
             if (content.extendedTextMessage) {
-                console.log("extended text: " + content.extendedTextMessage.text);
+                text = content.extendedTextMessage.text;
             }
             if (content.contactMessage) {
-                console.log("contact: " + content.contactMessage);
+                text = content.contactMessage.displayName + ": " + content.contactMessage.vcard;
             }
             if (content.imageMessage) {
-                console.log("image: " + content.imageMessage.url);
+                text = content.imageMessage.url + "\n\n" + content.imageMessage.caption;
             }
             if (content.audioMessage) {
-                console.log("audio: " + content.audioMessage.url);
+                text = content.audioMessage.url;
             }
             if (content.documentMessage) {
-                console.log("document: " + content.documentMessage.url);
+                text = content.documentMessage.url;
+            }
+            console.log("text: " + text);
+
+            if (to === "Me") {
+                sendMail(from, subject, text);
             }
         }
         console.log("---");
@@ -83,7 +89,5 @@ async function connectToWhatsApp() {
 
     await conn.connect();
 }
-
-sendMail("Pontigram", "Test", "This is a test e-mail from Pontigram.");
 
 connectToWhatsApp();
