@@ -36,24 +36,26 @@ async function connectToWhatsApp() {
             console.log("envelope:");
             console.log(envelope);
             
-            let subject = "Private";
             let from = "";
             let to = "Me";
+            let subject = "";
             let text = "";
             if (envelope.key.fromMe) {
                 from = "Me";
                 to = conn.contacts[envelope.key.remoteJid].name;
+                subject = to;
             } else {
                 if (envelope.key.participant) {
-                    subject = conn.contacts[envelope.key.remoteJid].name;
                     from = conn.contacts[envelope.key.participant].name;
+                    subject = conn.contacts[envelope.key.remoteJid].name;
                 } else {
                     from = conn.contacts[envelope.key.remoteJid].name;
+                    subject = from;
                 }
             }
-            console.log("subject: " + subject);
             console.log("from: " + from);
             console.log("to: " + to);
+            console.log("subject: " + subject);
 
             const content = envelope.message;
             if (content.conversation) {
