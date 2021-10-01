@@ -8,15 +8,24 @@ let config = JSON.parse(fs.readFileSync("config.json"));
 
 let transporter = nodemailer.createTransport(config.transport);
 
-async function sendMail(from, subject, text) {
+if (!fs.existsSync("./media")) {
+    fs.mkdirSync("./media");
+    console.log("media directory created");
+} else {
+    console.log("media directory exists");
+}
+
+async function sendMail(from, subject, text, attachments) {
     let info = await transporter.sendMail({
         from: '"' + from + '" <' + config.mail + '>',
         to: config.mail,
         subject: subject,
-        text: text
+        text: text,
+        attachments: attachments
     });
 
     console.log("E-mail sent: %s", info.messageId);
+    console.log("---");
 }
 
 async function connectToWhatsApp() {
@@ -35,11 +44,12 @@ async function connectToWhatsApp() {
             const envelope = chat.messages.all()[0];
             console.log("envelope:");
             console.log(envelope);
-            
+
             let from = "";
             let to = "Me";
             let subject = "";
             let text = "";
+            let attachments = [];
             if (envelope.key.fromMe) {
                 from = "Me";
                 to = conn.contacts[envelope.key.remoteJid].name;
@@ -53,9 +63,6 @@ async function connectToWhatsApp() {
                     subject = from;
                 }
             }
-            console.log("from: " + from);
-            console.log("to: " + to);
-            console.log("subject: " + subject);
 
             const content = envelope.message;
             if (content.conversation) {
@@ -67,19 +74,20 @@ async function connectToWhatsApp() {
             if (content.contactMessage) {
                 text = content.contactMessage.displayName + ": " + content.contactMessage.vcard;
             }
-            if (content.imageMessage) {
-                text = content.imageMessage.url + "\n\n" + content.imageMessage.caption;
+            if (content.imageMessage || content.audioMessage || content.documentMessage) {
+                text = content.imageMessage.caption || "";
+                const file = await conn.downloadAndSaveMediaMessage(envelope, "./media/" + envelope.key.id);
+                attachments.push({ path: file });
             }
-            if (content.audioMessage) {
-                text = content.audioMessage.url;
-            }
-            if (content.documentMessage) {
-                text = content.documentMessage.url;
-            }
+            
+            console.log("from: " + from);
+            console.log("to: " + to);
+            console.log("subject: " + subject);
             console.log("text: " + text);
+            console.log("attachments: " + attachments);
 
             if (to === "Me") {
-                sendMail(from, subject, text);
+                sendMail(from, subject, text, attachments);
             }
         }
         console.log("---");
