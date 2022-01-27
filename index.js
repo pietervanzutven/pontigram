@@ -1,8 +1,8 @@
 "use strict";
 
-const fs = require('fs')
+const fs = require('fs');
 const nodemailer = require("nodemailer");
-const { WAConnection } = require("@adiwajshing/baileys")
+const { WAConnection } = require("@adiwajshing/baileys");
 
 let config = JSON.parse(fs.readFileSync("config.json"));
 
@@ -29,7 +29,7 @@ async function sendMail(from, subject, text, attachments) {
 }
 
 async function connectToWhatsApp() {
-    const conn = new WAConnection()
+    const conn = new WAConnection();
 
     conn.on("open", () => {
         config.whatsapp = conn.base64EncodedAuthInfo();
